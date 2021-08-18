@@ -9,16 +9,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cglib.core.Local;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest  // MockMvc bean 을 자동 설정함. 따라서 그냥 가져와서 쓰자.. "웹" 관련 빈만 등록해줌.
@@ -37,6 +38,7 @@ public class EventControllerTests {
 
     @MockBean
     EventRepository eventRepository;
+
     //이제 본격적으로 테스트를 만들거임.
     @Test
     public void createEvent() throws Exception {  //perform Exception 처리라는데 Excaption 박아버리네..?
@@ -63,6 +65,8 @@ public class EventControllerTests {
                 .andDo(print())
                 .andExpect(status().isCreated()) //isCreated == is(201) 같은 내용
                 .andExpect(jsonPath("id").exists())
+                .andExpect(header().exists(HttpHeaders.LOCATION)) // "location"보다 Type-Safe한 방식
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))//"Content_Type", "application/hal+json" 보다 Type-Safe한 방식
         ;
     }
 
