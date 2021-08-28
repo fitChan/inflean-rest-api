@@ -1,6 +1,7 @@
 package com.gisunlecture.infleanrestapi.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gisunlecture.infleanrestapi.common.TestDescription;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //@WebMvcTest  // MockMvc bean 을 자동 설정함. 따라서 그냥 가져와서 쓰자.. "웹" 관련 빈만 등록해줌.
 @SpringBootTest //MOCK이 기본값이라 Mock을 이용한 태스트가 계속해서 가능 ctrl+좌클릭 해볼 것.
 @AutoConfigureMockMvc
-@EnableWebMvc
 public class EventControllerTests {
 
     @Autowired
@@ -47,6 +47,7 @@ public class EventControllerTests {
 
     //이제 본격적으로 테스트를 만들거임.
     @Test
+    @TestDescription("정상적으로 이벤트를 생성하는 테스트")
     public void createEvent() throws Exception {  //perform Exception 처리라는데 Excaption 박아버리네..?
         EventDto event = EventDto.builder()
                 //존나 귀찮긴한데... 빌더로 설정을 해주는거임
@@ -82,6 +83,7 @@ public class EventControllerTests {
     }
 
     @Test
+    @TestDescription("입력받을 수 없는 값을 사용한 경우에 에러가 발생하는 테스트")
     public void createEvent_Bad_Request() throws Exception {  //perform Exception 처리라는데 Excaption 박아버리네..?
         Event event = Event.builder()
                 .id(100)
@@ -111,16 +113,18 @@ public class EventControllerTests {
 
 
     @Test
+    @TestDescription("입력 값이 비어있는 경우에 발생하는 테스트")
     public void createEvent_Bad_Request_Empty_Input() throws Exception {
         EventDto eventDto = EventDto.builder().build();
 
         this.mockMvc.perform(post("/api/events")
                 .contentType(MediaType.APPLICATION_JSON)
-                .contentType(this.objectMapper.writeValueAsString(eventDto)))
+                .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    @TestDescription("입력 값이 잘못된 경우에 발생하는 테스트")
     public void createEvent_Bad_Request_Wrong_Input() throws Exception {
         EventDto event = EventDto.builder()
                 .name("Spring")
@@ -137,7 +141,7 @@ public class EventControllerTests {
 
         this.mockMvc.perform(post("/api/events")
                 .contentType(MediaType.APPLICATION_JSON)
-                .contentType(this.objectMapper.writeValueAsString(event)))
+                .content(this.objectMapper.writeValueAsString(event)))
                 .andExpect(status().isBadRequest());
     }
 
