@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.time.LocalDateTime;
 
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //@WebMvcTest  // MockMvc bean 을 자동 설정함. 따라서 그냥 가져와서 쓰자.. "웹" 관련 빈만 등록해줌.
 @SpringBootTest //MOCK이 기본값이라 Mock을 이용한 태스트가 계속해서 가능 ctrl+좌클릭 해볼 것.
 @AutoConfigureMockMvc
+@EnableWebMvc
 public class EventControllerTests {
 
     @Autowired
@@ -46,9 +48,8 @@ public class EventControllerTests {
     //이제 본격적으로 테스트를 만들거임.
     @Test
     public void createEvent() throws Exception {  //perform Exception 처리라는데 Excaption 박아버리네..?
-        Event event = Event.builder()
+        EventDto event = EventDto.builder()
                 //존나 귀찮긴한데... 빌더로 설정을 해주는거임
-                .id(100)
                 .name("Spring")
                 .description("REST API Developmetn with Spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2018, 11, 23, 14, 21))
@@ -59,9 +60,6 @@ public class EventControllerTests {
                 .maxPrice(200)
                 .limitOfEnrollment(100)
                 .location("강남역 D2스타텁 팩토리")
-                .free(true)
-                .offline(false)
-                .eventStatus(EventStatus.PUBLISHED)
                 .build();
 /*
             repo에 Event event = Event.builder()가 save될때!! then --> event를 돌려줘!
@@ -81,9 +79,9 @@ public class EventControllerTests {
                 .andExpect(jsonPath("id").value(Matchers.not(100)))
                 .andExpect(jsonPath("free").value(Matchers.not(true)))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()));
+    }
 
-
-    }@Test
+    @Test
     public void createEvent_Bad_Request() throws Exception {  //perform Exception 처리라는데 Excaption 박아버리네..?
         Event event = Event.builder()
                 .id(100)
@@ -111,5 +109,36 @@ public class EventControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+
+    @Test
+    public void createEvent_Bad_Request_Empty_Input() throws Exception {
+        EventDto eventDto = EventDto.builder().build();
+
+        this.mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(this.objectMapper.writeValueAsString(eventDto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createEvent_Bad_Request_Wrong_Input() throws Exception {
+        EventDto event = EventDto.builder()
+                .name("Spring")
+                .description("REST API Developmetn with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2018, 11, 23, 14, 21))
+                .closeEnrollmentDateTime(LocalDateTime.of(2017, 11, 25, 14, 21))
+                .beginEventDateTime(LocalDateTime.of(2018, 11, 23, 14, 21))
+                .endEventDateTime(LocalDateTime.of(2017, 12, 23, 14, 21))
+                .basePrice(1007)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2스타텁 팩토리")
+                .build();
+
+        this.mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(this.objectMapper.writeValueAsString(event)))
+                .andExpect(status().isBadRequest());
+    }
 
 }
