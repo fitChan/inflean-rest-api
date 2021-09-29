@@ -1,26 +1,39 @@
 package com.gisunlecture.infleanrestapi.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gisunlecture.infleanrestapi.common.RestDocsConfiguration;
 import com.gisunlecture.infleanrestapi.common.TestDescription;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cglib.core.Local;
+import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -30,7 +43,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //@WebMvcTest  // MockMvc bean 을 자동 설정함. 따라서 그냥 가져와서 쓰자.. "웹" 관련 빈만 등록해줌.
 @SpringBootTest //MOCK이 기본값이라 Mock을 이용한 태스트가 계속해서 가능 ctrl+좌클릭 해볼 것.
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
+@Import(RestDocsConfiguration.class)
 public class EventControllerTests {
+
+
 
     @Autowired
     //스프링 MVC 테스트 핵심 클래스 이며 웹서버를 띄우지 않고도 스프링MVC(DispatcherServlet)가
@@ -41,6 +59,7 @@ public class EventControllerTests {
 
     @Autowired
     ObjectMapper objectMapper;
+
 
 //    @MockBean
 //    EventRepository eventRepository;  -> 실제 repo를 쓸거니까 지운다? 괜찮지?
@@ -84,6 +103,7 @@ public class EventControllerTests {
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.query-events").exists())
                 .andExpect(jsonPath("_links.update-event").exists())
+                .andDo(document("create-event"))
         ;
 
     }
