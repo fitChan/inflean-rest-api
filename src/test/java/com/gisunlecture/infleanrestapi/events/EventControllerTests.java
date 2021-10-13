@@ -32,8 +32,12 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -47,7 +51,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @Import(RestDocsConfiguration.class)
 public class EventControllerTests {
-
 
 
     @Autowired
@@ -103,7 +106,57 @@ public class EventControllerTests {
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.query-events").exists())
                 .andExpect(jsonPath("_links.update-event").exists())
-                .andDo(document("create-event"))
+                .andDo(document("create-event",
+                        links(
+                                linkWithRel("self").description("link to self"),
+                                linkWithRel("query-events").description("link to query events"),
+                                linkWithRel("update-event").description("link to update an existing events")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("accept header"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
+                        ),
+                        requestFields(
+                                fieldWithPath("name").description("Name of new event"),
+                                fieldWithPath("description").description("descriprion of new event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("date time of begin new event of enrollment"),
+                                fieldWithPath("closeEnrollmentDateTime").description("date time of close new event of enrollment"),
+                                fieldWithPath("beginEventDateTime").description("date time of begin new event"),
+                                fieldWithPath("endEventDateTime").description("date time of close new event"),
+                                fieldWithPath("location").description("location of close new event"),
+                                fieldWithPath("basePrice").description("baseprice of close new event"),
+                                fieldWithPath("maxPrice").description("maxPrice of close new event"),
+                                fieldWithPath("limitOfEnrollment").description("limit of enrollment of close new event")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("Location header"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type")
+                        ),
+                        //전체 조회가 하기 싫어? 그러면 relaxed를 붙여 그러면 깐깐하게 모든 부분을 검사하지 않아.. 안해주면 The following parts of the payload were not documented 에러가 발생해! links는 이미 문서화 해놨어
+                        //relaxed를 사용할때 주의: 정확한 문서를 제작하기 어렵다. -> 문서 일부분만 테스트 하는 것이기 때문에 완벽하지 않다. 장점이자 단점임.
+//                        relaxedResponseFields(
+                        //link 추가
+                        responseFields(
+                                fieldWithPath("id").description("identifier of new event"),
+                                fieldWithPath("name").description("Name of new event"),
+                                fieldWithPath("description").description("descriprion of new event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("date time of begin new event of enrollment"),
+                                fieldWithPath("closeEnrollmentDateTime").description("date time of close new event of enrollment"),
+                                fieldWithPath("beginEventDateTime").description("date time of begin new event"),
+                                fieldWithPath("endEventDateTime").description("date time of close new event"),
+                                fieldWithPath("location").description("location of close new event"),
+                                fieldWithPath("basePrice").description("basePrice of close new event"),
+                                fieldWithPath("maxPrice").description("maxPrice of close new event"),
+                                fieldWithPath("limitOfEnrollment").description("limit of enrollment of close new event"),
+                                fieldWithPath("free").description("whether free or not"),
+                                fieldWithPath("offline").description("offline or online"),
+                                fieldWithPath("eventStatus").description("event status"),
+                                fieldWithPath("_links.self.href").description("link to self"),
+                                fieldWithPath("_links.query-events.href").description("link to query-event list"),
+                                fieldWithPath("_links.update-event.href").description("link to update an existing event")
+
+                        )
+                ))
         ;
 
     }
