@@ -72,7 +72,7 @@ public class EventControllerTests {
     @TestDescription("정상적으로 이벤트를 생성하는 테스트")
     public void createEvent() throws Exception {  //perform Exception 처리라는데 Excaption 박아버리네..?
         EventDto event = EventDto.builder()
-                //존나 귀찮긴한데... 빌더로 설정을 해주는거임
+                // 귀찮긴한데... 빌더로 설정을 해주는거임
                 .name("Spring")
                 .description("REST API Developmetn with Spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2018, 11, 23, 14, 21))
@@ -136,7 +136,7 @@ public class EventControllerTests {
                         //relaxed를 사용할때 주의: 정확한 문서를 제작하기 어렵다. -> 문서 일부분만 테스트 하는 것이기 때문에 완벽하지 않다. 장점이자 단점임.
 //                        relaxedResponseFields(
                         //link 추가
-                        responseFields(
+                        relaxedResponseFields(
                                 fieldWithPath("id").description("identifier of new event"),
                                 fieldWithPath("name").description("Name of new event"),
                                 fieldWithPath("description").description("descriprion of new event"),
@@ -150,10 +150,10 @@ public class EventControllerTests {
                                 fieldWithPath("limitOfEnrollment").description("limit of enrollment of close new event"),
                                 fieldWithPath("free").description("whether free or not"),
                                 fieldWithPath("offline").description("offline or online"),
-                                fieldWithPath("eventStatus").description("event status"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.query-events.href").description("link to query-event list"),
-                                fieldWithPath("_links.update-event.href").description("link to update an existing event")
+                                fieldWithPath("eventStatus").description("event status")
+//                                fieldWithPath("_links.self.href").description("link to self"),
+//                                fieldWithPath("_links.query-events.href").description("link to query-event list"),
+//                                fieldWithPath("_links.update-event.href").description("link to update an existing event")
 
                         )
                 ))

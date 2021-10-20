@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(Parameterized.class)
 public class EventTest {
     @Test
     public void builder() {

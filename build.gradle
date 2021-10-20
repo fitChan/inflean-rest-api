@@ -49,9 +49,12 @@ dependencies {
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.7.0'
 
-//    asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:{1.5.8}'
-//    testCompileOnly('org.springframework.restdocs:spring-restdocs-mockmvc:{2.5.3}')
+
+    // https://mvnrepository.com/artifact/org.asciidoctor/asciidoctor-gradle-plugin
+    implementation group: 'org.asciidoctor', name: 'asciidoctor-gradle-plugin', version: '1.5.3'
+
 }
+
 
 test {
     outputs.dir snippetsDir
